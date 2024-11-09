@@ -22,3 +22,17 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  redis:
+    image: redis:7.4
+
+  celery-beat:
+    image: sgonzalezmo/kafka-celery-beat:latest
+    build:
+      context: https://github.com/sgonzalezmo/kafka-celery-beat.git
+    depends_on:
+      - redis
+      - kafka
+    environment:
+      CELERY_BROKER_URL: redis://redis:6379
+      CELERY_RESULT_BACKEND: redis://redis:6379
