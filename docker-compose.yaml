@@ -1,4 +1,4 @@
-version: ‘3.7'
+version: '3.7'
 
 services:
   zookeeper:
@@ -26,10 +26,36 @@ services:
   redis:
     image: redis:7.4
 
+  celery-flower:
+    image: mher/flower
+    ports:
+      - 5555:5555
+    depends_on:
+      - redis
+    environment:
+      CELERY_BROKER_URL: redis://redis:6379/0
+      FLOWER_PORT: 5555
+
+  celery-worker:
+    deploy:
+      replicas: 1
+    image: sgonzalezmo/kafka-celery-worker:latest
+    build:
+      context: https://github.com/sgonzalezmo/kafka-celery-beat.git
+    depends_on:
+      - redis
+    environment:
+      CELERY_BROKER_URL: redis://redis:6379
+      CELERY_RESULT_BACKEND: redis://redis:6379
+      KAFKA_SERVER: kafka:9092
+      KAFKA_TOPIC: test
+      KAFKA_CONSUMER_GROUP: kafka-celery-worker-consumer-group
+      KAFKA_CONSUMER_TIMEOUT: 1000
+
   celery-beat:
     image: sgonzalezmo/kafka-celery-beat:latest
     build:
-      context: https://github.com/sgonzalezmo/kafka-celery-beat.git
+      context: https://github.com/sgonzalezmo/kafka-celery-worker.git
     depends_on:
       - redis
       - kafka
