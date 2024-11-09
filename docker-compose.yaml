@@ -41,7 +41,7 @@ services:
       replicas: 1
     image: sgonzalezmo/kafka-celery-worker:latest
     build:
-      context: https://github.com/sgonzalezmo/kafka-celery-beat.git
+      context: https://github.com/sgonzalezmo/kafka-celery-worker.git
     depends_on:
       - redis
     environment:
@@ -55,7 +55,7 @@ services:
   celery-beat:
     image: sgonzalezmo/kafka-celery-beat:latest
     build:
-      context: https://github.com/sgonzalezmo/kafka-celery-worker.git
+      context: https://github.com/sgonzalezmo/kafka-celery-beat.git
     depends_on:
       - redis
       - kafka
